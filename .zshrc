@@ -116,3 +116,4 @@ eval `dircolors /home/maroon/.dir_colors/dircolors`
 export SQLPATH=Files/Dev/oracle
 
 export JAVA_HOME=/usr/lib/jvm/java-1.8.0-openjdk-amd64
+export JRE_HOME=/usr/lib/jvm/java-1.8.0-openjdk-amd64/jre/

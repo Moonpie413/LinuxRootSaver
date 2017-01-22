@@ -17,6 +17,8 @@
 " Tagbar: <F8>
 " Folding: <z-o>,<z-c>,<z-r><z-m>
 " CodeFormat: <C-f>
+" GoTo Definition: <leader-gd>
+" Surround: change: <cs> Delete: <ds> Add: <ysiw>
 " ============================================================
 " General
 set number	" Show line numbers
@@ -67,11 +69,11 @@ Plugin 'VundleVim/Vundle.vim'
 Plugin 'vim-scripts/indentpython.vim'
 
 " 自动补全
-Plugin 'Shougo/neocomplete.vim'
+Plugin 'Valloric/YouCompleteMe'
 
 " Jedi Python补全
 " 需要pip安装jedi
-Plugin 'davidhalter/jedi-vim'
+" Plugin 'davidhalter/jedi-vim'
 
 " airline
 Plugin 'vim-airline/vim-airline'
@@ -124,6 +126,9 @@ Plugin 'elzr/vim-json'
 " EasyMotion
 Plugin 'easymotion/vim-easymotion'
 
+" Surround
+Plugin 'tpope/vim-surround'
+
 " All of your Plugins must be added before the following line
 call vundle#end()            " required
 filetype plugin indent on    " required
@@ -140,91 +145,6 @@ filetype plugin indent on    " required
 " Put your non-Plugin stuff after this line
 " Vundle Over
 
-" ============================== NEO Complete ===============================
-" Disable AutoComplPop.
-let g:acp_enableAtStartup = 0
-" Use neocomplete.
-let g:neocomplete#enable_at_startup = 1
-" Use smartcase.
-let g:neocomplete#enable_smart_case = 1
-" Set minimum syntax keyword length.
-let g:neocomplete#sources#syntax#min_keyword_length = 3
-
-" Define dictionary.
-let g:neocomplete#sources#dictionary#dictionaries = {
-	    \ 'default' : '',
-	    \ 'vimshell' : $HOME.'/.vimshell_hist',
-	    \ 'scheme' : $HOME.'/.gosh_completions'
-	    \ }
-
-" Define keyword.
-if !exists('g:neocomplete#keyword_patterns')
-    let g:neocomplete#keyword_patterns = {}
-endif
-let g:neocomplete#keyword_patterns['default'] = '\h\w*'
-
-" Plugin key-mappings.
-inoremap <expr><C-g>     neocomplete#undo_completion()
-inoremap <expr><C-l>     neocomplete#complete_common_string()
-
-" Recommended key-mappings.
-" <CR>: close popup and save indent.
-inoremap <silent> <CR> <C-r>=<SID>my_cr_function()<CR>
-function! s:my_cr_function()
-    return (pumvisible() ? "\<C-y>" : "" ) . "\<CR>"
-    " For no inserting <CR> key.
-    "return pumvisible() ? "\<C-y>" : "\<CR>"
-endfunction
-" <TAB>: completion.
-inoremap <expr><TAB>  pumvisible() ? "\<C-n>" : "\<TAB>"
-" <C-h>, <BS>: close popup and delete backword char.
-inoremap <expr><C-h> neocomplete#smart_close_popup()."\<C-h>"
-inoremap <expr><BS> neocomplete#smart_close_popup()."\<C-h>"
-" Close popup by <Space>.
-"inoremap <expr><Space> pumvisible() ? "\<C-y>" : "\<Space>"
-
-" AutoComplPop like behavior.
-"let g:neocomplete#enable_auto_select = 1
-
-" Shell like behavior(not recommended).
-"set completeopt+=longest
-"let g:neocomplete#enable_auto_select = 1
-"let g:neocomplete#disable_auto_complete = 1
-"inoremap <expr><TAB>  pumvisible() ? "\<Down>" : "\<C-x>\<C-u>"
-
-" Enable omni completion.
-autocmd FileType css setlocal omnifunc=csscomplete#CompleteCSS
-autocmd FileType html,markdown setlocal omnifunc=htmlcomplete#CompleteTags
-autocmd FileType javascript setlocal omnifunc=javascriptcomplete#CompleteJS
-autocmd FileType python setlocal omnifunc=jedi#completions " 设置python使用jedi补全
-autocmd FileType xml setlocal omnifunc=xmlcomplete#CompleteTags
-
-" Enable heavy omni completion.
-if !exists('g:neocomplete#sources#omni#input_patterns')
-    let g:neocomplete#sources#omni#input_patterns = {}
-endif
-"let g:neocomplete#sources#omni#input_patterns.php = '[^. \t]->\h\w*\|\h\w*::'
-"let g:neocomplete#sources#omni#input_patterns.c = '[^.[:digit:] *\t]\%(\.\|->\)'
-"let g:neocomplete#sources#omni#input_patterns.cpp = '[^.[:digit:] *\t]\%(\.\|->\)\|\h\w*::'
-
-" For perlomni.vim setting.
-" https://github.com/c9s/perlomni.vim
-let g:neocomplete#sources#omni#input_patterns.perl = '\h\w*->\h\w*\|\h\w*::'
-
-" Jedi配合配置
-let g:jedi#completions_enabled = 0
-let g:jedi#auto_vim_configuration = 0
-
-if !exists('g:neocomplete#force_omni_input_patterns')
-    let g:neocomplete#force_omni_input_patterns = {}
-endif
-let g:neocomplete#force_omni_input_patterns.python = '\%([^. \t]\.\|^\s*@\|^\s*from\s.\+import \|^\s*from \|^\s*import \)\w*'
-
-" NeoComplete JavaScript
-let g:neocomplete#sources#omni#input_patterns.javascript = '\h\w*\|[^. \t]\.\w*'
-
-" ========================== NEO Complete 结束 ================================
-
 " airline配置
 set laststatus=2
 let g:airline_powerline_fonts = 1
@@ -235,6 +155,12 @@ syntax on
 set t_Co=256
 set termguicolors
 color dracula
+
+" YCM配置
+let g:ycm_python_binary_path = '/usr/bin/python3'
+let g:ycm_seed_identifiers_with_syntax=1 " 开启语意补全
+let g:ycm_collect_identifiers_from_tags_files = 1 " 开启基于tags的补全
+
 
 " syntastic 代码纠错
 set statusline+=%#warningmsg#
@@ -257,7 +183,7 @@ let g:syntastic_style_warning_symbol = '⚠'
 " NERDTree配置
 " 设置快捷键
 map <C-n> :NERDTreeToggle<CR>
-autocmd bufenter * if (winnr("$") == 1 && exists("b:NERDTree") && b:NERDTree.isTabTree()) | q | endif " 自动关闭 
+autocmd bufenter * if (winnr("$") == 1 && exists("b:NERDTree") && b:NERDTree.isTabTree()) | q | endif " 自动关闭
 " 设置符号
 let g:NERDTreeDirArrowExpandable = '▸'
 let g:NERDTreeDirArrowCollapsible = '▾'
@@ -294,6 +220,26 @@ nmap <Leader>L <Plug>(easymotion-overwin-line)
 map  <Leader>w <Plug>(easymotion-bd-w)
 nmap <Leader>w <Plug>(easymotion-overwin-w)
 " ==============================================
+
+"按F5一键编译并运行
+map <F5> :call CompileRunGcc()<CR>
+func! CompileRunGcc()
+    exec "w"
+    if &filetype == 'c'
+	exec "!g++ % -DLOCAL -o   %<"
+	exec "!time ./%<"
+    elseif &filetype == 'cpp'
+	exec "!g++ % -std=c++11 -DLOCAL -Dxiaoai -o    %<"
+	exec "!time ./%<"
+    elseif &filetype == 'java'
+	exec "!javac %"
+	exec "!time java %<"
+    elseif &filetype == 'sh'
+	:!time bash %
+    elseif &filetype == 'python'
+	exec "!time python3.5 %"
+    endif
+endfunc
 
 " GUI配置
 if has('gui_running')
