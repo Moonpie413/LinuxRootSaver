@@ -1,0 +1,9 @@
+# 忽略虽有文件
+/*
+# 跟踪 .zshrc, .vimrc, .oh-my-zsh, .vim, .dir_colors
+!/.zshrc
+!/.vimrc
+!/.oh-my-zsh
+!/.vim
+!/.dir_colors
+!/.gitignore
