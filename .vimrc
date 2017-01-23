@@ -152,9 +152,19 @@ let g:airline#extensions#tabline#enabled = 1
 
 " colorscheme
 syntax on
+set background=dark
 set t_Co=256
+" 下面这行在Tmux下会导致没有高亮
+if &term =~# '^screen'
+    let &t_8f = "\<Esc>[38;2;%lu;%lu;%lum"
+    let &t_8b = "\<Esc>[48;2;%lu;%lu;%lum"
+endif
+colorscheme dracula
+" Makes the background transparent. Leave these out if you're not using a transparent
+" terminal.
+highlight Normal ctermbg=NONE guibg=NONE
+highlight NonText ctermbg=NONE guibg=NONE
 set termguicolors
-color dracula
 
 " YCM配置
 let g:ycm_python_binary_path = '/usr/bin/python3'
